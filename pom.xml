@@ -112,10 +112,16 @@
 
     <profiles>
         <profile>
-            <id>brevo</id>
+            <id>smtp2go</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <mail.provider>smtp2go</mail.provider>
+            </properties>
+        </profile>
+        <profile>
+            <id>brevo</id>
             <properties>
                 <mail.provider>brevo</mail.provider>
             </properties>
