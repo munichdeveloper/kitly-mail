@@ -88,7 +88,7 @@ class Smtp2GoMailProviderTest {
 
         assertThatThrownBy(() -> smtp2GoMailProvider.sendEmail(email))
                 .isInstanceOf(MailProviderException.class)
-                .hasMessageContaining("No message ID");
+                .hasMessageContaining("send failed");
     }
 
     @Test
