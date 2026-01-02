@@ -106,6 +106,30 @@ mvn spring-boot:run
 
 The service will start on port 8080.
 
+### Running with Docker
+
+Build and run using Docker Compose:
+```bash
+export BREVO_API_KEY=your-actual-api-key
+export APP_USERNAME=admin
+export APP_PASSWORD=secure-password
+docker-compose up -d
+```
+
+This will start both PostgreSQL and the application.
+
+To build the Docker image manually:
+```bash
+mvn clean package
+docker build -t kitly-mail:latest .
+docker run -p 8080:8080 \
+  -e BREVO_API_KEY=your-key \
+  -e APP_USERNAME=admin \
+  -e APP_PASSWORD=secure \
+  -e MAIL_PROVIDER=brevo \
+  kitly-mail:latest
+```
+
 ## API Endpoints
 
 All endpoints require Basic Authentication.
@@ -174,6 +198,8 @@ Possible status values: `PENDING`, `SENT`, `FAILED`
 GET /api/emails?recipient=user@example.com
 Authorization: Basic <base64-encoded-credentials>
 ```
+
+For more examples including curl commands, see [EXAMPLES.md](EXAMPLES.md).
 
 ## Testing
 
