@@ -36,6 +36,12 @@ public class Smtp2GoMailProvider implements MailProvider {
 
     @Override
     public String sendEmail(Email email) throws MailProviderException {
+        // Validate that at least one content type is provided
+        if ((email.getHtmlContent() == null || email.getHtmlContent().isEmpty()) &&
+            (email.getTextContent() == null || email.getTextContent().isEmpty())) {
+            throw new MailProviderException("Email must have either HTML or text content");
+        }
+
         try {
             log.info("Sending email via SMTP2GO to: {}", email.getToEmail());
 
@@ -68,11 +74,13 @@ public class Smtp2GoMailProvider implements MailProvider {
     private Map<String, Object> buildSmtp2GoRequest(Email email) {
         Map<String, Object> request = new HashMap<>();
 
-        // Sender email address
-        request.put("sender", email.getFromEmail());
+        // Sender with name and email in format "Name <email>"
+        String sender = formatEmailAddress(email.getFromName(), email.getFromEmail());
+        request.put("sender", sender);
 
-        // Recipient email addresses (as array)
-        request.put("to", List.of(email.getToEmail()));
+        // Recipient with name and email in format "Name <email>"
+        String recipient = formatEmailAddress(email.getToName(), email.getToEmail());
+        request.put("to", List.of(recipient));
 
         // Subject
         request.put("subject", email.getSubject());
@@ -88,6 +96,13 @@ public class Smtp2GoMailProvider implements MailProvider {
         }
 
         return request;
+    }
+
+    private String formatEmailAddress(String name, String email) {
+        if (name != null && !name.isEmpty()) {
+            return name + " <" + email + ">";
+        }
+        return email;
     }
 
     @Override

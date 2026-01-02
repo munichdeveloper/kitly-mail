@@ -149,6 +149,41 @@ class Smtp2GoMailProviderTest {
         assertThat(smtp2GoMailProvider.getProviderName()).isEqualTo("SMTP2GO");
     }
 
+    @Test
+    void testSendEmailWithNoContent() {
+        Email email = Email.builder()
+                .fromEmail("sender@example.com")
+                .fromName("Sender Name")
+                .toEmail("recipient@example.com")
+                .toName("Recipient Name")
+                .subject("Test Subject")
+                .build();
+
+        assertThatThrownBy(() -> smtp2GoMailProvider.sendEmail(email))
+                .isInstanceOf(MailProviderException.class)
+                .hasMessageContaining("Email must have either HTML or text content");
+    }
+
+    @Test
+    void testSendEmailIncludesNamesInRequest() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+                .setBody("{\"request_id\":\"test-id\"," +
+                        "\"data\":{\"succeeded\":true,\"message_id\":\"msg-with-names\"}}")
+                .addHeader("Content-Type", "application/json"));
+
+        Email email = createTestEmail();
+        String messageId = smtp2GoMailProvider.sendEmail(email);
+
+        assertThat(messageId).isEqualTo("msg-with-names");
+
+        RecordedRequest request = mockWebServer.takeRequest();
+        String requestBody = request.getBody().readUtf8();
+        // Verify sender includes name and email in "Name <email>" format
+        assertThat(requestBody).contains("Sender Name <sender@example.com>");
+        // Verify recipient includes name and email in "Name <email>" format
+        assertThat(requestBody).contains("Recipient Name <recipient@example.com>");
+    }
+
     private Email createTestEmail() {
         return Email.builder()
                 .fromEmail("sender@example.com")
