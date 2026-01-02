@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: kitly-mail-db
+    environment:
+      POSTGRES_DB: kitlymail
+      POSTGRES_USER: kitlyuser
+      POSTGRES_PASSWORD: kitlypass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - kitly-network
+
+  kitly-mail:
+    build: .
+    container_name: kitly-mail-service
+    depends_on:
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_USERNAME: kitlyuser
+      DB_PASSWORD: kitlypass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kitlymail
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      APP_USERNAME: ${APP_USERNAME:-admin}
+      APP_PASSWORD: ${APP_PASSWORD:-admin}
+      MAIL_PROVIDER: brevo
+    ports:
+      - "8080:8080"
+    networks:
+      - kitly-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+
+networks:
+  kitly-network:
+    driver: bridge

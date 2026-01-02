@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: kitly-mail
+
+  datasource:
+    url: jdbc:h2:mem:kitlymail
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Mail provider configuration
+mail:
+  provider: ${mail.provider:brevo}
+
+# BREVO configuration
+brevo:
+  api:
+    key: ${BREVO_API_KEY:your-brevo-api-key}
+    url: https://api.brevo.com/v3
+
+# Application security
+app:
+  security:
+    username: ${APP_USERNAME:admin}
+    password: ${APP_PASSWORD:admin}
+
+# Server configuration
+server:
+  port: 8080
+
+# Logging
+logging:
+  level:
+    com.kitly.mail: INFO
+    org.springframework.security: INFO

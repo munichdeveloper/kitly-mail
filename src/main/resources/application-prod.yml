@@ -1,0 +1,75 @@
+# Production configuration example
+# Copy this file and customize for your production environment
+
+spring:
+  application:
+    name: kitly-mail
+
+  datasource:
+    # Use PostgreSQL in production
+    url: jdbc:postgresql://localhost:5432/kitlymail
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+
+  h2:
+    console:
+      enabled: false
+
+# Mail provider configuration
+mail:
+  provider: brevo
+
+# BREVO configuration
+brevo:
+  api:
+    key: ${BREVO_API_KEY}
+    url: https://api.brevo.com/v3
+
+# Application security
+app:
+  security:
+    username: ${APP_USERNAME}
+    password: ${APP_PASSWORD}
+
+# Server configuration
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.kitly.mail: INFO
+    org.springframework.security: WARN
+  file:
+    name: /var/log/kitly-mail/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints (for health checks)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
