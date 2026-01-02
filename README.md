@@ -16,7 +16,7 @@ Mailing Service for the Kitly Service - A Spring Boot based REST API for sending
 ## Technology Stack
 
 - Java 17
-- Spring Boot 3.2.0
+- Spring Boot 4.0.1
 - Spring Security (Basic Auth)
 - Spring Data JPA + Hibernate
 - Flyway (Database migrations)
