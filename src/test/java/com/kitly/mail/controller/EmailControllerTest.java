@@ -1,30 +1,30 @@
 package com.kitly.mail.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kitly.mail.model.Email;
 import com.kitly.mail.service.EmailService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kitly.mail.service.MailProviderException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmailController.class)
 @ActiveProfiles("test")
@@ -91,6 +91,28 @@ class EmailControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void testSendEmailProviderFailure() throws Exception {
+        EmailRequest request = EmailRequest.builder()
+                .fromEmail("sender@example.com")
+                .fromName("Sender")
+                .toEmail("recipient@example.com")
+                .toName("Recipient")
+                .subject("Test Subject")
+                .htmlContent("<h1>Test</h1>")
+                .build();
+
+        when(emailService.sendEmail(any(Email.class)))
+                .thenThrow(new MailProviderException("Provider error"));
+
+        mockMvc.perform(post("/api/emails")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

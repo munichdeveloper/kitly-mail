@@ -2,6 +2,7 @@ package com.kitly.mail.controller;
 
 import com.kitly.mail.model.Email;
 import com.kitly.mail.service.EmailService;
+import com.kitly.mail.service.MailProviderException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +35,14 @@ public class EmailController {
                 .textContent(request.getTextContent())
                 .build();
 
-        Email sentEmail = emailService.sendEmail(email);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(EmailResponse.fromEmail(sentEmail));
+        try {
+            Email sentEmail = emailService.sendEmail(email);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(EmailResponse.fromEmail(sentEmail));
+        } catch (MailProviderException e) {
+            log.error("Failed to send email: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")

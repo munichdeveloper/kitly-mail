@@ -55,12 +55,17 @@ class EmailServiceTest {
                 .thenThrow(new MailProviderException("Provider error"));
         when(emailRepository.save(any(Email.class))).thenAnswer(i -> i.getArgument(0));
 
-        Email result = emailService.sendEmail(email);
+        assertThatThrownBy(() -> emailService.sendEmail(email))
+                .isInstanceOf(MailProviderException.class)
+                .hasMessage("Provider error");
 
-        assertThat(result.getStatus()).isEqualTo(Email.EmailStatus.FAILED);
-        assertThat(result.getErrorMessage()).contains("Provider error");
-        assertThat(result.getSentAt()).isNull();
-        verify(emailRepository, times(2)).save(any(Email.class));
+        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
+        verify(emailRepository, times(2)).save(emailCaptor.capture());
+
+        Email savedEmail = emailCaptor.getAllValues().get(1);
+        assertThat(savedEmail.getStatus()).isEqualTo(Email.EmailStatus.FAILED);
+        assertThat(savedEmail.getErrorMessage()).contains("Provider error");
+        assertThat(savedEmail.getSentAt()).isNull();
     }
 
     @Test

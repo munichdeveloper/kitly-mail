@@ -19,7 +19,7 @@ public class EmailService {
     private final MailProvider mailProvider;
 
     @Transactional
-    public Email sendEmail(Email email) {
+    public Email sendEmail(Email email) throws MailProviderException {
         email.setStatus(Email.EmailStatus.PENDING);
         email = emailRepository.save(email);
 
@@ -29,13 +29,14 @@ public class EmailService {
             email.setStatus(Email.EmailStatus.SENT);
             email.setSentAt(LocalDateTime.now());
             log.info("Email sent successfully. ID: {}, External ID: {}", email.getId(), externalId);
+            return emailRepository.save(email);
         } catch (MailProviderException e) {
             email.setStatus(Email.EmailStatus.FAILED);
             email.setErrorMessage(e.getMessage());
+            emailRepository.save(email);
             log.error("Failed to send email. ID: {}", email.getId(), e);
+            throw e;
         }
-
-        return emailRepository.save(email);
     }
 
     public Email getEmailById(Long id) {
