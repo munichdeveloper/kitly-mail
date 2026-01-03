@@ -6,7 +6,8 @@ Mailing Service for the Kitly Service - A Spring Boot based REST API for sending
 
 - **REST API**: Simple HTTP endpoints for sending and managing emails
 - **Provider Abstraction**: Clean interface for swapping email service providers
-- **BREVO Integration**: Reference implementation using BREVO (Sendinblue) API
+- **SMTP2GO Integration**: Default implementation using SMTP2GO API
+- **BREVO Integration**: Alternative implementation using BREVO (Sendinblue) API
 - **Spring Security**: Basic authentication for API endpoints
 - **Database Persistence**: Email tracking with JPA/Hibernate and H2 database
 - **Flyway Migrations**: Database schema versioning
@@ -35,6 +36,7 @@ The service follows a clean architecture pattern:
 ├── repository/       # Data access layer
 ├── model/            # Domain entities
 ├── provider/         # Email provider implementations
+│   ├── smtp2go/     # SMTP2GO implementation (default)
 │   └── brevo/       # BREVO implementation
 └── config/          # Spring configuration
 ```
@@ -42,7 +44,8 @@ The service follows a clean architecture pattern:
 ### Key Components
 
 - **MailProvider Interface**: Abstract contract for email service providers
-- **BrevoMailProvider**: Reference implementation for BREVO API
+- **Smtp2GoMailProvider**: Default implementation for SMTP2GO API
+- **BrevoMailProvider**: Alternative implementation for BREVO API
 - **EmailService**: Orchestrates email sending and persistence
 - **EmailController**: REST API endpoints
 - **Email Entity**: JPA entity for tracking email status
@@ -53,11 +56,12 @@ The service follows a clean architecture pattern:
 
 - Java 17 or higher
 - Maven 3.6+
-- BREVO API key (get one at https://www.brevo.com/)
+- SMTP2GO API key (get one at https://www.smtp2go.com/) for the default provider
+- Or BREVO API key (get one at https://www.brevo.com/) if using the brevo profile
 
 ### Build
 
-Build with default BREVO profile:
+Build with default SMTP2GO profile:
 ```bash
 mvn clean package
 ```
@@ -65,6 +69,7 @@ mvn clean package
 Build with specific profile:
 ```bash
 mvn clean package -Pbrevo
+mvn clean package -Psmtp2go
 ```
 
 ### Configuration
@@ -72,7 +77,13 @@ mvn clean package -Pbrevo
 Configure the application by setting environment variables or updating `application.yml`:
 
 ```yaml
-# BREVO API Configuration
+# SMTP2GO API Configuration (Default)
+smtp2go:
+  api:
+    key: ${SMTP2GO_API_KEY:your-smtp2go-api-key}
+    url: https://api.smtp2go.com/v3
+
+# BREVO API Configuration (Alternative)
 brevo:
   api:
     key: ${BREVO_API_KEY:your-brevo-api-key}
@@ -89,7 +100,7 @@ app:
 
 Set environment variables:
 ```bash
-export BREVO_API_KEY=your-actual-api-key
+export SMTP2GO_API_KEY=your-actual-api-key
 export APP_USERNAME=your-username
 export APP_PASSWORD=your-secure-password
 ```
@@ -110,7 +121,7 @@ The service will start on port 8080.
 
 Build and run using Docker Compose:
 ```bash
-export BREVO_API_KEY=your-actual-api-key
+export SMTP2GO_API_KEY=your-actual-api-key
 export APP_USERNAME=admin
 export APP_PASSWORD=secure-password
 docker-compose up -d
@@ -122,6 +133,16 @@ To build the Docker image manually:
 ```bash
 mvn clean package
 docker build -t kitly-mail:latest .
+docker run -p 8080:8080 \
+  -e SMTP2GO_API_KEY=your-key \
+  -e APP_USERNAME=admin \
+  -e APP_PASSWORD=secure \
+  -e MAIL_PROVIDER=smtp2go \
+  kitly-mail:latest
+```
+
+For BREVO provider, use:
+```bash
 docker run -p 8080:8080 \
   -e BREVO_API_KEY=your-key \
   -e APP_USERNAME=admin \
@@ -216,13 +237,14 @@ mvn test jacoco:report
 The test suite includes:
 - Unit tests for models, services, and controllers
 - Integration tests for the complete email flow
-- Mock server tests for the BREVO provider
+- Mock server tests for the SMTP2GO and BREVO providers
 
 ## Maven Profiles
 
 The service supports multiple email providers through Maven profiles:
 
-- **brevo** (default): BREVO/Sendinblue provider
+- **smtp2go** (default): SMTP2GO provider
+- **brevo**: BREVO/Sendinblue provider
 - **mailgun**: Placeholder for MAILGUN implementation (not implemented)
 
 Activate a specific profile:
@@ -246,6 +268,8 @@ public class MailgunProvider implements MailProvider {
 3. Add configuration properties to `application.yml`
 4. Add a Maven profile in `pom.xml`
 5. Add tests for your implementation
+
+See the SMTP2GO and BREVO implementations as reference examples.
 
 ## Database
 

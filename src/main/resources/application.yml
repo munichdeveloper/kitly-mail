@@ -27,7 +27,13 @@ spring:
 
 # Mail provider configuration
 mail:
-  provider: ${mail.provider:brevo}
+  provider: ${mail.provider:smtp2go}
+
+# SMTP2GO configuration
+smtp2go:
+  api:
+    key: ${SMTP2GO_API_KEY:your-smtp2go-api-key}
+    url: https://api.smtp2go.com/v3
 
 # BREVO configuration
 brevo:
