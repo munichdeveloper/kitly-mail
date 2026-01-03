@@ -6,13 +6,13 @@ spring:
     name: kitly-mail
 
   datasource:
-    # Use PostgreSQL in production
-    url: jdbc:postgresql://localhost:5432/kitlymail
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0&preferQueryMode=simple&user=postgres.appsfjcoavulzbxxpcpo}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres.appsfjcoavulzbxxpcpo}
+    password: ${SPRING_DATASOURCE_PASSWORD:MHw0HMP4vAnNPDE1}
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
     show-sql: false
@@ -22,16 +22,20 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
+    table: flyway_schema_history_mail
     enabled: true
-    baseline-on-migrate: false
-
-  h2:
-    console:
-      enabled: false
+    baseline-version: 0
+    baseline-on-migrate: true
 
 # Mail provider configuration
 mail:
-  provider: brevo
+  provider: ${MAIL_PROVIDER:smtp2go}
+
+# SMTP2GO configuration
+smtp2go:
+  api:
+    key: ${SMTP2GO_API_KEY}
+    url: https://api.smtp2go.com/v3
 
 # BREVO configuration
 brevo:
@@ -41,6 +45,8 @@ brevo:
 
 # Application security
 app:
+  api:
+    key: ${APP_API_KEY:change-this-default-api-key}
   security:
     username: ${APP_USERNAME}
     password: ${APP_PASSWORD}
