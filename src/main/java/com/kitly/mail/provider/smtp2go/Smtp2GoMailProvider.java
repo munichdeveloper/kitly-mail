@@ -55,12 +55,18 @@ public class Smtp2GoMailProvider implements MailProvider {
                     .block();
 
             if (response != null && response.getData() != null 
-                    && Boolean.TRUE.equals(response.getData().getSucceeded())
-                    && response.getData().getMessageId() != null) {
-                log.info("Email sent successfully via SMTP2GO. Message ID: {}", response.getData().getMessageId());
-                return response.getData().getMessageId();
+                    && Boolean.TRUE.equals(response.getData().getSucceeded())) {
+                String messageId = response.getData().getMessageId();
+                if (messageId == null) {
+                    messageId = response.getRequestId();
+                }
+                if (messageId == null) {
+                    messageId = "UNKNOWN";
+                }
+                log.info("Email sent successfully via SMTP2GO. Message ID: {}", messageId);
+                return messageId;
             } else {
-                throw new MailProviderException("No message ID received from SMTP2GO or send failed");
+                throw new MailProviderException("No success status received from SMTP2GO or send failed");
             }
         } catch (WebClientResponseException e) {
             log.error("Error sending email via SMTP2GO: {}", e.getResponseBodyAsString(), e);

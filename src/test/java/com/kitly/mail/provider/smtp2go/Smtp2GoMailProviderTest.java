@@ -66,16 +66,15 @@ class Smtp2GoMailProviderTest {
     }
 
     @Test
-    void testSendEmailNoMessageId() {
+    void testSendEmailNoMessageId() throws MailProviderException {
         mockWebServer.enqueue(new MockResponse()
                 .setBody("{\"request_id\":\"test-id\",\"data\":{\"succeeded\":true}}")
                 .addHeader("Content-Type", "application/json"));
 
         Email email = createTestEmail();
 
-        assertThatThrownBy(() -> smtp2GoMailProvider.sendEmail(email))
-                .isInstanceOf(MailProviderException.class)
-                .hasMessageContaining("No message ID");
+        String messageId = smtp2GoMailProvider.sendEmail(email);
+        assertThat(messageId).isEqualTo("test-id");
     }
 
     @Test
