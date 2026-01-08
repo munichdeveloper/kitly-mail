@@ -6,7 +6,7 @@ services:
     container_name: kitly-mail-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:kitlyuser}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kitlyuser}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kitlypass}
       APP_API_KEY: ${APP_API_KEY:-change-this-default-api-key}
       APP_USERNAME: ${APP_USERNAME:-admin}
