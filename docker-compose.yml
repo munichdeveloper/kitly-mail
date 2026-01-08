@@ -16,6 +16,7 @@ services:
       LETSENCRYPT_HOST: ${VIRTUAL_HOST:-mail.yourdomain.de}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-yourmail+letsencrypt@mailprovider.com}
       SMTP2GO_API_KEY: ${SMTP2GO_API_KEY:-your-smtp2go-api-key}
+      SERVER_PORT: ${SERVER_PORT:-8080}
     networks:
       - auto-proxy
     restart: unless-stopped
