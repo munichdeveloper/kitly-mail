@@ -31,6 +31,7 @@ services:
       VIRTUAL_HOST: ${VIRTUAL_HOST:-mail.yourdomain.de}
       LETSENCRYPT_HOST: ${VIRTUAL_HOST:-mail.yourdomain.de}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-yourmail+letsencrypt@mailprovider.com}
+      SMTP2GO_API_KEY: ${SMTP2GO_API_KEY:-your-smtp2go-api-key}
     networks:
       - kitly-network
       - auto-proxy
