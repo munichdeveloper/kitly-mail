@@ -37,10 +37,13 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                     null,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
                 );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // Use createEmptyContext to ensure we are not using a recycled context
+            var context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
         }
 
         filterChain.doFilter(request, response);
     }
 }
-

@@ -23,6 +23,8 @@ brevo:
     url: http://localhost:8888
 
 app:
+  api:
+    key: test-api-key
   security:
     username: testuser
     password: testpass
