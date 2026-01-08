@@ -23,16 +23,17 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_USERNAME: kitlyuser
-      DB_PASSWORD: kitlypass
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kitlymail
-      BREVO_API_KEY: ${BREVO_API_KEY}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kitlypass}
+      APP_API_KEY: ${APP_API_KEY:-change-this-default-api-key}
       APP_USERNAME: ${APP_USERNAME:-admin}
       APP_PASSWORD: ${APP_PASSWORD:-admin}
-      MAIL_PROVIDER: brevo
-    ports:
-      - "8080:8080"
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-smtp2go}
+      VIRTUAL_HOST: mail.yourdomain.de
+      LETSENCRYPT_HOST: mail.yourdomain.de
+      LETSENCRYPT_EMAIL: yourmail+letsencrypt@mailprovider.com
     networks:
       - kitly-network
+      - auto-proxy
     restart: unless-stopped
 
 volumes:
@@ -41,3 +42,5 @@ volumes:
 networks:
   kitly-network:
     driver: bridge
+  auto-proxy:
+    external: true
