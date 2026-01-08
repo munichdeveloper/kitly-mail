@@ -1,16 +1,16 @@
-FROM eclipse-temurin:17-jre-alpine
-
+# Build stage
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy the jar file
-COPY target/kitly-mail-*.jar app.jar
+# Run stage
+FROM eclipse-temurin:17-jre-alpine
+RUN apk add --no-cache curl
+WORKDIR /app
+COPY --from=build /app/target/kitly-mail-*.jar app.jar
 
-# Create a non-root user
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-
-# Expose port
 EXPOSE 8080
 
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
