@@ -28,9 +28,9 @@ services:
       APP_USERNAME: ${APP_USERNAME:-admin}
       APP_PASSWORD: ${APP_PASSWORD:-admin}
       MAIL_PROVIDER: ${MAIL_PROVIDER:-smtp2go}
-      VIRTUAL_HOST: mail.yourdomain.de
-      LETSENCRYPT_HOST: mail.yourdomain.de
-      LETSENCRYPT_EMAIL: yourmail+letsencrypt@mailprovider.com
+      VIRTUAL_HOST: ${VIRTUAL_HOST:-mail.yourdomain.de}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST:-mail.yourdomain.de}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-yourmail+letsencrypt@mailprovider.com}
     networks:
       - kitly-network
       - auto-proxy
