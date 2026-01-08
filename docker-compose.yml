@@ -1,28 +1,12 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: kitly-mail-db
-    environment:
-      POSTGRES_DB: kitlymail
-      POSTGRES_USER: kitlyuser
-      POSTGRES_PASSWORD: kitlypass
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - kitly-network
-
   kitly-mail:
     build: .
     container_name: kitly-mail-service
-    depends_on:
-      - postgres
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_USERNAME: kitlyuser
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:kitlyuser}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kitlypass}
       APP_API_KEY: ${APP_API_KEY:-change-this-default-api-key}
       APP_USERNAME: ${APP_USERNAME:-admin}
@@ -33,15 +17,9 @@ services:
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-yourmail+letsencrypt@mailprovider.com}
       SMTP2GO_API_KEY: ${SMTP2GO_API_KEY:-your-smtp2go-api-key}
     networks:
-      - kitly-network
       - auto-proxy
     restart: unless-stopped
 
-volumes:
-  postgres-data:
-
 networks:
-  kitly-network:
-    driver: bridge
   auto-proxy:
     external: true
