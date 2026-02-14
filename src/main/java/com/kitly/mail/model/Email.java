@@ -45,10 +45,10 @@ public class Email {
     @Column(nullable = false)
     private EmailStatus status;
 
-    @Column
+    @Column(length = 500)
     private String externalId;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
     @Column(nullable = false)
